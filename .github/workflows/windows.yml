@@ -38,7 +38,7 @@ jobs:
         shell: pwsh
         run: |
           $setup = Get-ChildItem dist/installers/PicLocate-*-Setup-${{ matrix.arch }}.exe | Select-Object -First 1
-          $qt = (Select-String -LiteralPath .build/ci-release/CMakeCache.txt -Pattern '^PICLOCATE_QT_ROOT:PATH=').Line.Split('=',2)[1]
+          $qt = (Get-Content -LiteralPath .build/ci-release/dependency-paths.json -Raw | ConvertFrom-Json).qt
           ./scripts/test-installer.ps1 -Installer $setup.FullName -PayloadDirectory .build/ci-release/installer-stage -OffscreenPlugin "$qt/plugins/platforms/qoffscreen.dll" -TestDirectory "$env:RUNNER_TEMP/PicLocate installer verification"
       - name: Keep test diagnostics
         if: always()
