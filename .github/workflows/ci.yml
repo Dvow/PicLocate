@@ -12,7 +12,7 @@ permissions:
   contents: read
 concurrency:
   group: piclocate-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
 jobs:
   quality:
     uses: ./.github/workflows/quality.yml
