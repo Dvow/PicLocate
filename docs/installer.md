@@ -22,7 +22,7 @@ The CMake `setup` target packages without testing; `PICLOCATE_BUILD_INSTALLER=OF
 
 Use an account without an existing installation. Tests check CPU search/fallback, reinstall, uninstall and preservation. `-PreviousInstaller <path>` adds upgrade coverage. Native helper: `python3 scripts/test-update.py`.
 
-Linux builds add `.deb` packages (x64/ARM64) and `.pkg.tar.zst` (Arch x64). `scripts/package-linux.py` packages the deployed bundle using dpkg/makepkg. CI tests Debian and Arch installs in disposable containers.
+Linux releases include `.deb` packages (x64/ARM64) and `.pkg.tar.zst` (Arch x64). `scripts/package-linux.py` uses available dpkg/makepkg tools. CI builds the Arch package in Arch Linux and tests both installers in disposable containers.
 
 ## Releases and updates
 

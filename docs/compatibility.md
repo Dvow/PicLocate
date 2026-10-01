@@ -28,8 +28,7 @@ sudo apt-get install build-essential cmake ninja-build libgl-dev libegl-dev \
   libfontconfig1-dev libxkbcommon-dev libxkbcommon-x11-0 libxcb-cursor0 \
   libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
   libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-sync1 libxcb-xfixes0 \
-  libxcb-util1 libdbus-1-3 patchelf xvfb xauth dpkg-dev pacman-package-manager \
-  libarchive-tools fakeroot zstd
+  libxcb-util1 libdbus-1-3 patchelf xvfb xauth dpkg-dev
 ```
 
 Linux packages include Qt/ICU/ONNX/models; the OS supplies desktop, C/C++ and TLS libraries. Run `PicLocate.sh` after extraction.
