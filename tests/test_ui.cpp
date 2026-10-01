@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "library/database.h"
 #include "models/appearance.h"
+#include "test_directory.h"
 #include "ui/viewer.h"
 #include "ui/window.h"
 #include <QScopeGuard>
@@ -26,7 +27,7 @@ class UiTests : public QObject {
     }
   private slots:
     void updateSettings() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         Window window(paths, {QStringLiteral("example/piclocate"), QStringLiteral("windows-x64"),
                               QStringLiteral("1.7.1")});
@@ -62,7 +63,7 @@ class UiTests : public QObject {
         window.close();
     }
     void compactLayoutAndFilterState() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         Database database(paths);
         database.initialize();
@@ -261,7 +262,7 @@ class UiTests : public QObject {
     }
     void libraryInteraction() {
         QFETCH(QString, modelVersion);
-        QTemporaryDir directory;
+        test::Directory directory;
         QVERIFY(directory.isValid());
         Paths paths{directory.path()};
         paths.create();
@@ -352,7 +353,7 @@ class UiTests : public QObject {
         QCOMPARE(database.photo(secondId).notes, QStringLiteral("Autosaved on close"));
     }
     void appearanceSearchControls() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -421,7 +422,7 @@ class UiTests : public QObject {
         window.close();
     }
     void paginationAndThumbnailUpdates() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -523,7 +524,7 @@ class UiTests : public QObject {
         QVERIFY(!model.thumbnail(1).isNull());
     }
     void viewerNavigationAndZoom() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Photos photos;
         for (int i = 0; i < 2; ++i) {
             Photo photo;

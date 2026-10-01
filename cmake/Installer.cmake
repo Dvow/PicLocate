@@ -5,11 +5,11 @@ endif()
 set(PICLOCATE_INSTALLER_OUTPUT_DIR "${PROJECT_SOURCE_DIR}/dist/installers" CACHE PATH "Installer output directory")
 get_filename_component(PICLOCATE_INSTALLER_OUTPUT_DIR "${PICLOCATE_INSTALLER_OUTPUT_DIR}" ABSOLUTE)
 set(_inno_root "${PICLOCATE_DEPENDENCY_CACHE}/tools/innosetup-7.1.0")
-find_program(PICLOCATE_ISCC NAMES ISCC.exe ISCC HINTS
-  "${_inno_root}"
-  "$ENV{ProgramFiles}/Inno Setup 7"
-  "$ENV{ProgramFiles\(x86\)}/Inno Setup 7"
-  DOC "Optional Inno Setup 7 compiler override")
+set(PICLOCATE_ISCC "" CACHE FILEPATH "Optional Inno Setup 7.1+ compiler override")
+# Runner PATHs can contain Inno Setup 6. Default to the pinned portable compiler.
+if(NOT PICLOCATE_ISCC AND EXISTS "${_inno_root}/ISCC.exe")
+  set(PICLOCATE_ISCC "${_inno_root}/ISCC.exe" CACHE FILEPATH "Inno Setup compiler" FORCE)
+endif()
 if(NOT PICLOCATE_ISCC)
   CPMAddPackage(NAME PicLocateInnoSetup VERSION 7.1.0 DOWNLOAD_ONLY YES DOWNLOAD_NO_EXTRACT YES
     URL "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/innosetup-7.1.0-x64.exe"

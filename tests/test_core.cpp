@@ -5,6 +5,7 @@
 #include "models/appearance.h"
 #include "models/inference.h"
 #include "models/model_download.h"
+#include "test_directory.h"
 #include <QtConcurrent>
 #include <QtTest>
 #include <limits>
@@ -41,7 +42,7 @@ class CoreTests : public QObject {
         QCOMPARE(Inference::preprocess(image), Inference::preprocess(expected));
     }
     void textEvidenceMatchesColumnScopedFts() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -84,7 +85,7 @@ class CoreTests : public QObject {
     void metadataStaysWritableBetweenInferenceBatches() {
         if (qEnvironmentVariable("PICLOCATE_MODEL_DIR").isEmpty())
             QSKIP("Set PICLOCATE_MODEL_DIR for the concurrent indexing regression");
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -136,7 +137,7 @@ class CoreTests : public QObject {
         QCOMPARE(edited, 1);
     }
     void filenameWordsAndTransactionalUpgrade() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -202,7 +203,7 @@ class CoreTests : public QObject {
         QCOMPARE(database.count(), 1);
     }
     void paginatedOrderMatchesCompleteReference() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -451,7 +452,7 @@ class CoreTests : public QObject {
         }
     }
     void paginationReusesRankingAndRejectsStaleCursors() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -549,7 +550,7 @@ class CoreTests : public QObject {
         QCOMPARE(emissions, before);
     }
     void fileIntegrityUsesCompleteContents() {
-        QTemporaryDir directory;
+        test::Directory directory;
         const auto path = directory.path() + QStringLiteral("/model.bin");
         QVERIFY(fileSha256(path).isEmpty());
         auto write = [&](const QByteArray &bytes) {
@@ -582,7 +583,7 @@ class CoreTests : public QObject {
         QCOMPARE(after, QCryptographicHash::hash(bytes, QCryptographicHash::Sha256));
     }
     void similarityIntentAndExternalReference() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path() + QStringLiteral("/library")};
         paths.create();
         Database database(paths);
@@ -650,7 +651,7 @@ class CoreTests : public QObject {
         QCOMPARE(database.count(), 2); // A reference is never imported into the library.
     }
     void explicitMetadataOutranksGeneratedLabels() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database db(paths);
@@ -688,7 +689,7 @@ class CoreTests : public QObject {
         QVERIFY(result.photos.first().score > .65f);
     }
     void transactionalThumbnailsAndDeduplication() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -760,7 +761,7 @@ class CoreTests : public QObject {
     void identicalInputsReuseEmbeddingsAndKeepRecords() {
         if (qEnvironmentVariable("PICLOCATE_MODEL_DIR").isEmpty())
             QSKIP("Set PICLOCATE_MODEL_DIR for indexing");
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path() + QStringLiteral("/data")};
         paths.create();
         const auto folder = directory.path() + QStringLiteral("/images");
@@ -787,7 +788,7 @@ class CoreTests : public QObject {
         QCOMPARE(database.photo(first.id).notes, QStringLiteral("Independent record"));
     }
     void gpuModelCatalogCompatibility() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -854,7 +855,7 @@ class CoreTests : public QObject {
         QVERIFY_EXCEPTION_THROWN(appearanceDescriptor(QImage()), std::runtime_error);
     }
     void appearanceUpgradeAndSearchWithoutModels() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path() + QStringLiteral("/data")};
         paths.create();
         const auto folder = directory.path() + QStringLiteral("/assets");
@@ -936,7 +937,7 @@ class CoreTests : public QObject {
         QCOMPARE(database.stats().appearances, 0);
     }
     void preciseTextMatching() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -963,7 +964,7 @@ class CoreTests : public QObject {
         QCOMPARE(database.count(), 4);
     }
     void textModesSortingAndPagination() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -1038,7 +1039,7 @@ class CoreTests : public QObject {
         QCOMPARE(spy.size(), 0);
     }
     void scopedTextSearchAndMetadataRefresh() {
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path()};
         paths.create();
         Database database(paths);
@@ -1080,7 +1081,7 @@ class CoreTests : public QObject {
         const auto models = qEnvironmentVariable("PICLOCATE_MODEL_DIR");
         if (models.isEmpty())
             QSKIP("Set PICLOCATE_MODEL_DIR for model integration");
-        QTemporaryDir directory;
+        test::Directory directory;
         for (const auto &file :
              {QStringLiteral("text_model_quantized.onnx"), QStringLiteral("tokenizer.json")})
             QVERIFY(QFile::copy(models + u'/' + file, directory.path() + u'/' + file));
@@ -1094,7 +1095,7 @@ class CoreTests : public QObject {
         QVERIFY_EXCEPTION_THROWN(inference.image(image), std::runtime_error);
     }
     void catalogCompatibilityAndInvalidVectors() {
-        QTemporaryDir directory;
+        test::Directory directory;
         QVERIFY(directory.isValid());
         Paths paths{directory.path()};
         paths.create();
@@ -1181,7 +1182,7 @@ class CoreTests : public QObject {
     void legacyLibrarySemanticSearch() {
         if (qEnvironmentVariable("PICLOCATE_MODEL_DIR").isEmpty())
             QSKIP("Set PICLOCATE_MODEL_DIR for legacy semantic search regression");
-        QTemporaryDir directory;
+        test::Directory directory;
         QVERIFY(directory.isValid());
         Paths paths{directory.path()};
         paths.create();
@@ -1266,7 +1267,7 @@ class CoreTests : public QObject {
         QCOMPARE(topK(v, q, 99).size(), 3);
     }
     void databasePersistence() {
-        QTemporaryDir dir;
+        test::Directory dir;
         QVERIFY(dir.isValid());
         Paths paths{dir.path()};
         paths.create();
@@ -1312,7 +1313,7 @@ class CoreTests : public QObject {
         }
     }
     void folderRemovalDoesNotDeleteFiles() {
-        QTemporaryDir dir;
+        test::Directory dir;
         Paths paths{dir.path()};
         paths.create();
         Database db(paths);
@@ -1372,7 +1373,7 @@ class CoreTests : public QObject {
         }
     }
     void lexicalUpdates() {
-        QTemporaryDir dir;
+        test::Directory dir;
         Paths paths{dir.path()};
         paths.create();
         Database db(paths);
@@ -1395,7 +1396,7 @@ class CoreTests : public QObject {
         QVERIFY(db.lexical(QStringLiteral("invoice")).isEmpty());
     }
     void searchFilters() {
-        QTemporaryDir dir;
+        test::Directory dir;
         Paths paths{dir.path()};
         paths.create();
         Database db(paths);
@@ -1448,7 +1449,7 @@ class CoreTests : public QObject {
     void incrementalIndexingAndRecovery() {
         if (qEnvironmentVariable("PICLOCATE_MODEL_DIR").isEmpty())
             QSKIP("Set PICLOCATE_MODEL_DIR for native indexing integration");
-        QTemporaryDir directory;
+        test::Directory directory;
         Paths paths{directory.path() + QStringLiteral("/data")};
         paths.create();
         const auto folder = directory.path() + QStringLiteral("/photos");
