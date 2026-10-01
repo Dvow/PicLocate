@@ -6,6 +6,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = r"(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})"
@@ -58,6 +59,16 @@ def gh(*args, missing_ok=False):
     return json.loads(result.stdout) if result.stdout.strip().startswith(("{", "[")) else result.stdout
 
 
+def upload(repo, release_id, paths):
+    remote = {a["name"]: a for a in gh("api", f"repos/{repo}/releases/{release_id}")["assets"]}
+    for path in paths:
+        if path.name in remote:
+            gh("api", f"repos/{repo}/releases/assets/{remote[path.name]['id']}", "--method", "DELETE")
+        gh("api", f"https://uploads.github.com/repos/{repo}/releases/{release_id}/assets?name={quote(path.name)}",
+           "--method", "POST", "--header", "Content-Type: application/octet-stream",
+           "--header", f"Content-Length: {path.stat().st_size}", "--input", str(path))
+
+
 def publish(directory, repo, version, commit, ref):
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Release target must be a full commit SHA")
@@ -90,8 +101,7 @@ def publish(directory, repo, version, commit, ref):
     release_api = f"repos/{repo}/releases/{existing['id']}"
     checksums = directory / "SHA256SUMS"
     checksums.write_text("".join(f"{asset['digest'][7:]}  {asset['name']}\n" for asset in payload["assets"]), encoding="utf-8")
-    gh("release", "upload", tag, *[str(directory / a["name"]) for a in payload["assets"]],
-       str(checksums), "--repo", repo, "--clobber")
+    upload(repo, existing["id"], [*[directory / a["name"] for a in payload["assets"]], checksums])
     uploaded = gh("api", release_api)
     remote = {a["name"]: a for a in uploaded["assets"]}
     for asset in payload["assets"]:
@@ -100,7 +110,7 @@ def publish(directory, repo, version, commit, ref):
             raise ValueError(f"GitHub asset verification failed: {asset['name']}")
     update = directory / "update.json"
     update.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    gh("release", "upload", tag, str(update), "--repo", repo, "--clobber")
+    upload(repo, existing["id"], [update])
     metadata = gh("api", release_api)
     metadata_assets = {a["name"]: a for a in metadata["assets"]}
     for path in (checksums, update):

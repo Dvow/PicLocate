@@ -6,6 +6,7 @@ import unittest
 from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 spec = importlib.util.spec_from_file_location("release", Path(__file__).parents[1] / "scripts/release.py")
 release = importlib.util.module_from_spec(spec)
@@ -18,17 +19,27 @@ class GitHub:
         self.existing, self.latest, self.corrupt = existing, latest, corrupt
 
     def __call__(self, *args, **kwargs):
-        if args[:2] == ("release", "upload"):
+        if args[0] != "api":
+            raise AssertionError("Draft operations must use the release ID, not a tag-based CLI command")
+        if args[1].startswith("https://uploads.github.com/"):
             assets = {a["name"]: a for a in self.existing["assets"]}
-            for name in args[3:args.index("--repo")]:
-                path = Path(name)
-                assets[path.name] = {"name": path.name, "state": "uploaded", "size": path.stat().st_size,
-                                     "digest": f"sha256:{release.checksum(path)}"}
+            path = Path(args[args.index("--input") + 1])
+            if "Content-Type: application/octet-stream" not in args or f"Content-Length: {path.stat().st_size}" not in args:
+                raise AssertionError("Upload requires raw binary content with its exact length")
+            name = parse_qs(urlparse(args[1]).query)["name"][0]
+            if name in assets:
+                raise AssertionError("An existing asset must be removed before replacement")
+            assets[name] = {"id": len(assets) + 100, "name": name, "state": "uploaded", "size": path.stat().st_size,
+                            "digest": f"sha256:{release.checksum(path)}"}
             self.existing["assets"] = list(assets.values())
-            return ""
+            return deepcopy(assets[name])
         endpoint = next(arg for arg in args if arg.startswith("repos/"))
         fields = dict(arg.split("=", 1) for arg in args if "=" in arg and not arg.startswith("repos/"))
-        if "POST" in args:
+        if "DELETE" in args:
+            asset_id = int(endpoint.rsplit("/", 1)[1])
+            self.existing["assets"] = [a for a in self.existing["assets"] if a["id"] != asset_id]
+            return ""
+        elif "POST" in args:
             self.existing = {"id": 77, "tag_name": fields["tag_name"], "target_commitish": fields["target_commitish"],
                              "name": fields["name"], "draft": True, "author": {"login": "github-actions[bot]"}, "assets": []}
         elif "PATCH" in args:
@@ -122,7 +133,16 @@ class ReleaseTests(unittest.TestCase):
         with patch.object(release, "gh", side_effect=github) as gh:
             self.publish()
         self.assertFalse(github.existing["draft"])
-        self.assertFalse(any("POST" in c.args for c in gh.call_args_list))
+        self.assertFalse(any("POST" in c.args and c.args[1].endswith("/releases") for c in gh.call_args_list))
+
+    def test_partial_upload_is_replaced_and_verified(self):
+        stale = {"id": 12, "name": release.package_names(self.version)[0], "size": 3, "digest": "sha256:" + "0" * 64}
+        github = GitHub(self.draft(assets=[stale]))
+        with patch.object(release, "gh", side_effect=github) as gh:
+            self.publish()
+        self.assertFalse(github.existing["draft"])
+        self.assertEqual(len(github.existing["assets"]), 10)
+        self.assertTrue(any("DELETE" in c.args and c.args[1].endswith("/assets/12") for c in gh.call_args_list))
 
     def test_automation_draft_retargets_to_new_tested_commit(self):
         github = GitHub(self.draft(target_commitish="b" * 40))
