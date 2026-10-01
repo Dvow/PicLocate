@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate eight release packages; publish a draft only after all uploads verify."""
+"""Validate release packages; publish a draft only after all uploads verify."""
 import argparse
 import hashlib
 import json
@@ -25,7 +25,8 @@ def package_names(version):
         f"PicLocate-{version}-windows-{arch}.zip",
         f"PicLocate-{version}-linux-{arch}.tar.gz",
         f"PicLocate-{version}-macos-{arch}.dmg",
-    )]
+    )] + [f"PicLocate-{version}-linux-{arch}.deb" for arch in ("x64", "arm64")] + [
+        f"PicLocate-{version}-linux-x64.pkg.tar.zst"]
 
 
 def checksum(path):
@@ -118,7 +119,7 @@ def publish(directory, repo, version, commit, ref):
         if actual.get("digest") != f"sha256:{checksum(path)}" or actual.get("size") != path.stat().st_size:
             raise ValueError(f"GitHub metadata verification failed: {path.name}")
     gh("api", release_api, "--method", "PATCH", "-F", "draft=false", "-f", "make_latest=true")
-    print(f"Published {tag} with eight packages and verified update metadata.")
+    print(f"Published {tag} with {len(payload['assets'])} packages and verified update metadata.")
 
 
 def main():

@@ -94,12 +94,47 @@ class UpdateTests : public QObject {
                            current);
     }
   private slots:
+    void systemPackagesUseTheirPackageManager() {
+        QTemporaryDir directory;
+        const auto binary = directory.path() + QStringLiteral("/bin");
+        const auto resources = directory.path() + QStringLiteral("/share/PicLocate");
+        QVERIFY(QDir().mkpath(binary));
+        QVERIFY(QDir().mkpath(resources));
+        QVERIFY(systemPackageFormat(binary).isEmpty());
+        QFile marker(resources + QStringLiteral("/.piclocate-system-package"));
+        for (const auto &format : {QByteArrayLiteral("deb"), QByteArrayLiteral("arch")}) {
+            QVERIFY(marker.open(QIODevice::WriteOnly | QIODevice::Truncate));
+            marker.write(format + '\n');
+            marker.close();
+            QCOMPARE(systemPackageFormat(binary), QString::fromLatin1(format));
+            FixtureNetwork network;
+            AppUpdate update(directory.path(),
+                             {QStringLiteral("example/piclocate"),
+                              QStringLiteral("linux-x64-") + QString::fromLatin1(format),
+                              QStringLiteral("1.7.1")},
+                             &network);
+            QVERIFY(update.systemManaged());
+            QString error;
+            QVERIFY(!update.install(directory.path(), &error));
+            QVERIFY(
+                error.contains(format == "deb" ? QStringLiteral("apt") : QStringLiteral("pacman")));
+            QCOMPARE(network.requests, 0);
+        }
+        QVERIFY(marker.open(QIODevice::WriteOnly | QIODevice::Truncate));
+        marker.write("invalid\n");
+        marker.close();
+        QVERIFY(systemPackageFormat(binary).isEmpty());
+    }
     void packagesForEveryPlatform() {
         const QList<QPair<QString, QString>> packages{
             {QStringLiteral("windows-x64"), QStringLiteral("PicLocate-1.8.0-Setup-x64.exe")},
             {QStringLiteral("windows-arm64"), QStringLiteral("PicLocate-1.8.0-Setup-arm64.exe")},
             {QStringLiteral("linux-x64"), QStringLiteral("PicLocate-1.8.0-linux-x64.tar.gz")},
             {QStringLiteral("linux-arm64"), QStringLiteral("PicLocate-1.8.0-linux-arm64.tar.gz")},
+            {QStringLiteral("linux-x64-deb"), QStringLiteral("PicLocate-1.8.0-linux-x64.deb")},
+            {QStringLiteral("linux-arm64-deb"), QStringLiteral("PicLocate-1.8.0-linux-arm64.deb")},
+            {QStringLiteral("linux-x64-arch"),
+             QStringLiteral("PicLocate-1.8.0-linux-x64.pkg.tar.zst")},
             {QStringLiteral("macos-x64"), QStringLiteral("PicLocate-1.8.0-macos-x64.dmg")},
             {QStringLiteral("macos-arm64"), QStringLiteral("PicLocate-1.8.0-macos-arm64.dmg")}};
         for (const auto &[target, name] : packages) {

@@ -6,6 +6,10 @@ namespace piclocate {
 namespace {
 constexpr qint64 MaxManifest = 65536, MaxPackage = 2LL * 1024 * 1024 * 1024;
 QString packageName(const QString &version, const QString &target) {
+    if (target.endsWith(QStringLiteral("-deb")))
+        return QStringLiteral("PicLocate-%1-%2.deb").arg(version, target.chopped(4));
+    if (target.endsWith(QStringLiteral("-arch")))
+        return QStringLiteral("PicLocate-%1-%2.pkg.tar.zst").arg(version, target.chopped(5));
     const auto arch = target.section(u'-', 1);
     if (target.startsWith(QStringLiteral("windows-")))
         return QStringLiteral("PicLocate-%1-Setup-%2.exe").arg(version, arch);
@@ -76,8 +80,19 @@ bool verifyUpdateFile(const QString &path, const UpdateRelease &release) {
            QString::fromLatin1(hash.result().toHex()) == release.sha256;
 }
 UpdateSource AppUpdate::defaultSource() {
-    return {QString::fromLatin1(PICLOCATE_UPDATE_REPOSITORY),
-            QString::fromLatin1(PICLOCATE_PLATFORM_KEY), QString::fromLatin1(PICLOCATE_VERSION)};
+    auto platform = QString::fromLatin1(PICLOCATE_PLATFORM_KEY);
+    const auto format = systemPackageFormat(QCoreApplication::applicationDirPath());
+    if (platform.startsWith(QStringLiteral("linux-")) && !format.isEmpty())
+        platform += u'-' + format;
+    return {QString::fromLatin1(PICLOCATE_UPDATE_REPOSITORY), platform,
+            QString::fromLatin1(PICLOCATE_VERSION)};
+}
+QString systemPackageFormat(const QString &binaryDirectory) {
+    QFile marker(binaryDirectory + QStringLiteral("/../share/PicLocate/.piclocate-system-package"));
+    if (!marker.open(QIODevice::ReadOnly))
+        return {};
+    const auto format = QString::fromUtf8(marker.read(16)).trimmed();
+    return format == QStringLiteral("deb") || format == QStringLiteral("arch") ? format : QString();
 }
 AppUpdate::AppUpdate(QString cache, UpdateSource source, QNetworkAccessManager *network,
                      QObject *parent)
@@ -91,6 +106,15 @@ AppUpdate::~AppUpdate() {
 }
 bool AppUpdate::enabled() const {
     return !source_.repository.isEmpty();
+}
+bool AppUpdate::systemManaged() const {
+    return source_.platform.startsWith(QStringLiteral("linux-")) &&
+           (source_.platform.endsWith(QStringLiteral("-deb")) ||
+            source_.platform.endsWith(QStringLiteral("-arch")));
+}
+QString AppUpdate::packageManager() const {
+    return source_.platform.endsWith(QStringLiteral("-deb")) ? QStringLiteral("apt")
+                                                             : QStringLiteral("pacman");
 }
 void AppUpdate::setState(State state, const QString &message) {
     state_ = state;
@@ -223,6 +247,10 @@ void AppUpdate::request(const QUrl &url, bool asset) {
     });
 }
 bool AppUpdate::install(const QString &library, QString *error) {
+    if (systemManaged()) {
+        *error = QStringLiteral("Install this package with %1.").arg(packageManager());
+        return false;
+    }
     if (state_ != State::Ready || !verifyUpdateFile(downloaded_, release_)) {
         *error = QStringLiteral("The update is missing or damaged. Download it again.");
         setState(State::Available, *error);

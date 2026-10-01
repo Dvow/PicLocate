@@ -128,12 +128,21 @@ void Window::settingsDialog() {
         const auto refresh = [this, updateStatus, updateButton, updateProgress] {
             const auto state = updater_.state();
             updateStatus->setText(updater_.message().isEmpty()
-                                      ? QStringLiteral("Updates download from GitHub.")
+                                      ? (updater_.systemManaged()
+                                             ? QStringLiteral("Install updates with %1.")
+                                                   .arg(updater_.packageManager())
+                                             : QStringLiteral("Updates download from GitHub."))
                                       : updater_.message());
+            if (updater_.systemManaged() && state == AppUpdate::State::Ready)
+                updateStatus->setText(
+                    updateStatus->text() +
+                    QStringLiteral(" Install with %1.").arg(updater_.packageManager()));
             updateButton->setEnabled(state != AppUpdate::State::Checking);
             updateButton->setText(
-                state == AppUpdate::State::Available     ? QStringLiteral("Download update")
-                : state == AppUpdate::State::Ready       ? QStringLiteral("Install and restart")
+                state == AppUpdate::State::Available ? QStringLiteral("Download update")
+                : state == AppUpdate::State::Ready
+                    ? (updater_.systemManaged() ? QStringLiteral("Show package")
+                                                : QStringLiteral("Install and restart"))
                 : state == AppUpdate::State::Downloading ? QStringLiteral("Cancel update")
                                                          : QStringLiteral("Check for updates"));
             updateProgress->setVisible(state == AppUpdate::State::Downloading);
@@ -154,6 +163,11 @@ void Window::settingsDialog() {
                         updater_.cancel();
                         break;
                     case AppUpdate::State::Ready: {
+                        if (updater_.systemManaged()) {
+                            QDesktopServices::openUrl(QUrl::fromLocalFile(
+                                QFileInfo(updater_.packagePath()).absolutePath()));
+                            break;
+                        }
                         QString error;
                         if (updater_.install(paths_.root, &error)) {
                             saveSettings(autoUpdates);

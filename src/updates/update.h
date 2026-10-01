@@ -18,6 +18,7 @@ std::optional<UpdateRelease> parseUpdate(const QByteArray &json, const QString &
                                          const QString &platform, const QString &current);
 bool updateRedirectAllowed(const QUrl &url);
 bool verifyUpdateFile(const QString &path, const UpdateRelease &release);
+QString systemPackageFormat(const QString &binaryDirectory);
 
 class AppUpdate : public QObject {
     Q_OBJECT
@@ -29,6 +30,9 @@ class AppUpdate : public QObject {
               QObject *parent = nullptr);
     ~AppUpdate() override;
     bool enabled() const;
+    bool systemManaged() const;
+    QString packageManager() const;
+    QString packagePath() const { return downloaded_; }
     State state() const { return state_; }
     QString message() const { return message_; }
     void check();

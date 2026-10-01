@@ -1,0 +1,15 @@
+pkgname=piclocate
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Private image search by description, filename and visual similarity'
+arch=('x86_64')
+url='https://github.com/Dvow/PicLocate'
+license=('MIT')
+depends=(@DEPENDS@)
+options=('!strip' '!debug')
+source=('payload.tar')
+sha256sums=('@SHA256@')
+
+package() {
+    cp -a "$srcdir/root/." "$pkgdir/"
+}

@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
         const QJsonObject diagnostics{
             {QStringLiteral("application"), QCoreApplication::applicationName()},
             {QStringLiteral("version"), QCoreApplication::applicationVersion()},
+            {QStringLiteral("update_platform"), AppUpdate::defaultSource().platform},
             {QStringLiteral("os"), QSysInfo::prettyProductName()},
             {QStringLiteral("build_architecture"), QSysInfo::buildCpuArchitecture()},
             {QStringLiteral("host_architecture"), QSysInfo::currentCpuArchitecture()},

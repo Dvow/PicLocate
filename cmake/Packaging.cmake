@@ -13,7 +13,16 @@ if(WIN32)
 else()
   set(CMAKE_INSTALL_BINDIR bin)
   set(CMAKE_INSTALL_LIBDIR lib)
-  qt_generate_deploy_app_script(TARGET PicLocate OUTPUT_SCRIPT _deploy NO_TRANSLATIONS)
+  set(_plugin_selection)
+  if(NOT APPLE)
+    # SQLite and X11 are the supported Linux backends; avoid unused SQL/embedded drivers.
+    set(_plugin_selection
+      EXCLUDE_PLUGIN_TYPES sqldrivers generic egldeviceintegrations
+        wayland-decoration-client wayland-graphics-integration-client wayland-shell-integration
+      EXCLUDE_PLUGINS qgtk3
+      INCLUDE_PLUGINS qsqlite)
+  endif()
+  qt_generate_deploy_app_script(TARGET PicLocate OUTPUT_SCRIPT _deploy NO_TRANSLATIONS ${_plugin_selection})
   install(SCRIPT ${_deploy})
   if(NOT APPLE)
     install(FILES resources/piclocate.desktop DESTINATION share/applications)

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.2
+
+- Debian x64/ARM64 and Arch x64 installers with menu integration and runtime dependencies.
+- Package-manager updates and CI install/reinstall/uninstall checks.
+- Fixed macOS test paths, Windows installer discovery and draft release publishing.
+
 ## 1.7.1
 
 - Six-platform CI, verified GitHub releases and install/restart updates.

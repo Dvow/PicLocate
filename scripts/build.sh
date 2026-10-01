@@ -8,4 +8,7 @@ cmake --build "$build_dir" --parallel "${PICLOCATE_BUILD_JOBS:-4}"
 ctest --test-dir "$build_dir" --output-on-failure
 cmake --install "$build_dir" --prefix "$package_dir"
 cmake --build "$build_dir" --target package
+if [[ $(uname -s) == Linux ]]; then
+    python3 "$source_root/scripts/package-linux.py" "$package_dir"
+fi
 printf 'Ready: %s\n' "$package_dir"

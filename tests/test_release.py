@@ -83,7 +83,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_complete_manifest(self):
         payload = release.manifest(self.directory, self.repo, self.version)
-        self.assertEqual(len(payload["assets"]), 8)
+        self.assertEqual(len(payload["assets"]), 11)
         self.assertEqual(payload["tag_name"], "v1.8.0")
         self.assertFalse(payload["draft"])
         self.assertTrue(all(a["digest"].startswith("sha256:") and a["size"] == 12 for a in payload["assets"]))
@@ -123,10 +123,10 @@ class ReleaseTests(unittest.TestCase):
         with patch.object(release, "gh", side_effect=github) as gh:
             self.publish()
         self.assertFalse(github.existing["draft"])
-        self.assertEqual(len(github.existing["assets"]), 10)
+        self.assertEqual(len(github.existing["assets"]), 13)
         self.assertEqual(gh.call_args_list[-1].args[1], f"repos/{self.repo}/releases/77")
         self.assertIn("draft=false", gh.call_args_list[-1].args)
-        self.assertEqual(len(json.loads((self.directory / "update.json").read_text())["assets"]), 8)
+        self.assertEqual(len(json.loads((self.directory / "update.json").read_text())["assets"]), 11)
 
     def test_partial_draft_is_resumed_without_duplicate_creation(self):
         github = GitHub(self.draft())
@@ -141,7 +141,7 @@ class ReleaseTests(unittest.TestCase):
         with patch.object(release, "gh", side_effect=github) as gh:
             self.publish()
         self.assertFalse(github.existing["draft"])
-        self.assertEqual(len(github.existing["assets"]), 10)
+        self.assertEqual(len(github.existing["assets"]), 13)
         self.assertTrue(any("DELETE" in c.args and c.args[1].endswith("/assets/12") for c in gh.call_args_list))
 
     def test_automation_draft_retargets_to_new_tested_commit(self):

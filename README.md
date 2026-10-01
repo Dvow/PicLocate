@@ -8,6 +8,8 @@ Search images by description, filename or visual similarity. C++20 and Qt Widget
 
 On Windows, run setup or open `PicLocate.exe` from the portable folder. Keep the accompanying files together. Models are bundled; upgrades and uninstall preserve your library.
 
+Linux: install the `.deb` with `sudo apt install ./PicLocate-*.deb`, or the Arch package with `sudo pacman -U ./PicLocate-*.pkg.tar.zst`. Portable archives run with `./PicLocate.sh`. macOS: open the app from the DMG.
+
 1. **Add folder** to index images and subfolders. **Rescan** updates or resumes indexing.
 2. Use **Smart search** for descriptions, **Visual only** for image content or **Text only** for filenames, OCR and saved descriptions.
 3. Select **Find similar subjects** or **Match appearance**, or drop a reference image. Appearance modes match overall appearance, shape or palette.

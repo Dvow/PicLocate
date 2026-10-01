@@ -2,7 +2,7 @@
 Type=Application
 Name=PicLocate
 Comment=Find images in your library privately
-Exec=PicLocate
+Exec=piclocate
 Icon=piclocate
 Terminal=false
 Categories=Graphics;Photography;

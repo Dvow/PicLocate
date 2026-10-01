@@ -26,6 +26,7 @@ jobs:
         with:
           path: ~/AppData/Local/PicLocateBuild/cache
           key: piclocate-windows-${{ matrix.arch }}-${{ hashFiles('cmake/**', 'scripts/*.json') }}
+          restore-keys: piclocate-windows-${{ matrix.arch }}-
       - name: Build, test and package
         shell: pwsh
         env:
