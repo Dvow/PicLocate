@@ -66,6 +66,10 @@ def publish(directory, repo, version, commit, ref):
         raise ValueError("Tag does not match the CMake version")
     payload = manifest(directory, repo, version)
     existing = gh("api", f"repos/{repo}/releases/tags/{tag}", missing_ok=True)
+    if not existing:
+        # The tag endpoint returns published releases; drafts are listed separately.
+        pages = gh("api", "--paginate", "--slurp", f"repos/{repo}/releases?per_page=100")
+        existing = next((item for page in pages for item in page if item["tag_name"] == tag), None)
     if existing and not existing["draft"]:
         print(f"{tag} is already published; assets are unchanged.")
         return
@@ -75,15 +79,20 @@ def publish(directory, repo, version, commit, ref):
         if not re.fullmatch(VERSION, current) or tuple(map(int, version.split("."))) <= tuple(map(int, current.split("."))):
             raise ValueError("A release must be newer than the latest stable version")
     if existing and existing["target_commitish"] != commit:
-        raise ValueError("An existing draft belongs to a different commit")
+        if existing.get("author", {}).get("login") != "github-actions[bot]" or existing.get("name") != f"PicLocate {version}":
+            raise ValueError("An existing draft belongs to a different commit")
+        existing = gh("api", f"repos/{repo}/releases/{existing['id']}", "--method", "PATCH",
+                      "-f", f"target_commitish={commit}")
     if not existing:
-        gh("release", "create", tag, "--repo", repo, "--target", commit,
-           "--draft", "--title", f"PicLocate {version}", "--generate-notes")
+        existing = gh("api", f"repos/{repo}/releases", "--method", "POST",
+                      "-f", f"tag_name={tag}", "-f", f"target_commitish={commit}",
+                      "-f", f"name=PicLocate {version}", "-F", "draft=true", "-F", "generate_release_notes=true")
+    release_api = f"repos/{repo}/releases/{existing['id']}"
     checksums = directory / "SHA256SUMS"
     checksums.write_text("".join(f"{asset['digest'][7:]}  {asset['name']}\n" for asset in payload["assets"]), encoding="utf-8")
     gh("release", "upload", tag, *[str(directory / a["name"]) for a in payload["assets"]],
        str(checksums), "--repo", repo, "--clobber")
-    uploaded = gh("api", f"repos/{repo}/releases/tags/{tag}")
+    uploaded = gh("api", release_api)
     remote = {a["name"]: a for a in uploaded["assets"]}
     for asset in payload["assets"]:
         actual = remote.get(asset["name"], {})
@@ -92,13 +101,13 @@ def publish(directory, repo, version, commit, ref):
     update = directory / "update.json"
     update.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     gh("release", "upload", tag, str(update), "--repo", repo, "--clobber")
-    metadata = gh("api", f"repos/{repo}/releases/tags/{tag}")
+    metadata = gh("api", release_api)
     metadata_assets = {a["name"]: a for a in metadata["assets"]}
     for path in (checksums, update):
         actual = metadata_assets.get(path.name, {})
         if actual.get("digest") != f"sha256:{checksum(path)}" or actual.get("size") != path.stat().st_size:
             raise ValueError(f"GitHub metadata verification failed: {path.name}")
-    gh("release", "edit", tag, "--repo", repo, "--draft=false", "--latest")
+    gh("api", release_api, "--method", "PATCH", "-F", "draft=false", "-f", "make_latest=true")
     print(f"Published {tag} with eight packages and verified update metadata.")
 
 
