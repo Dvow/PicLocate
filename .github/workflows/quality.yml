@@ -1,0 +1,26 @@
+name: Code quality
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  formatting:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the project formatter
+        run: python3 -m pip install clang-format==23.1.1
+      - name: Check C++ formatting
+        run: find src tests -type f \( -name '*.cpp' -o -name '*.h' \) -print0 | xargs -0 clang-format --dry-run --Werror
+      - name: Check Python tool syntax
+        run: python3 -m compileall -q scripts tests
+      - name: Verify release publishing
+        run: python3 -m unittest discover -s tests -p 'test_release.py' -v
+      - name: Check workflow syntax
+        run: |
+          curl --fail --location --retry 3 https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz -o "$RUNNER_TEMP/actionlint.tar.gz"
+          echo '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8'"  $RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -shellcheck= -pyflakes= .github/workflows/*.yml

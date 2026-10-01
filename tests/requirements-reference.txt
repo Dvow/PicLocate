@@ -1,0 +1,5 @@
+# Developer-only reference comparison. Never needed to run PicLocate.
+numpy==2.5.3
+Pillow==12.3.0
+onnxruntime==1.30.0
+tokenizers==0.23.2

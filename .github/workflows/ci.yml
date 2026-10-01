@@ -1,0 +1,52 @@
+name: Build and release
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the current version after every platform passes
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: piclocate-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  quality:
+    uses: ./.github/workflows/quality.yml
+  windows:
+    uses: ./.github/workflows/windows.yml
+    with:
+      update_repository: ${{ github.repository }}
+  native:
+    uses: ./.github/workflows/native.yml
+    with:
+      update_repository: ${{ github.repository }}
+  release:
+    needs: [quality, windows, native]
+    if: >-
+      github.event_name != 'pull_request' &&
+      ((github.event_name == 'push' &&
+        (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))) ||
+       (github.event_name == 'workflow_dispatch' && inputs.publish && github.ref == 'refs/heads/main'))
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require a main-branch commit
+        run: test "$GITHUB_SHA" = "$(git rev-parse origin/main)"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: release-*
+          path: .build/release
+          merge-multiple: true
+      - name: Publish complete release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release.py .build/release --publish --repository "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" --ref "$GITHUB_REF"

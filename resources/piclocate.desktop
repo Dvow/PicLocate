@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=PicLocate
+Comment=Find images in your library privately
+Exec=PicLocate
+Icon=piclocate
+Terminal=false
+Categories=Graphics;Photography;
+Keywords=images;photos;search;local;

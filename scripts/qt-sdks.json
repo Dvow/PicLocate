@@ -1,0 +1,137 @@
+{
+  "windows-x64": {
+    "subdir": "msvc2022_64",
+    "archives": [
+      {
+        "name": "qtimageformats",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_64/qt.qt6.6112.addons.qtimageformats.win64_msvc2022_64/6.11.2-0-202608131017qtimageformats-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-X86_64.7z",
+        "sha256": "d6822c2160ebb675525173deb84bbfb68b4be046ee7f126af74a400a285b933d"
+      },
+      {
+        "name": "qtbase",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_64/qt.qt6.6112.win64_msvc2022_64/6.11.2-0-202608131017qtbase-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-X86_64.7z",
+        "sha256": "fd984b7264361b4dd3fd2a417702ca1258e4086268f2ee6a69b9a393d9c3f6bb"
+      },
+      {
+        "name": "qtsvg",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_64/qt.qt6.6112.win64_msvc2022_64/6.11.2-0-202608131017qtsvg-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-X86_64.7z",
+        "sha256": "417f44499c835b2303f3ff78043179bb23442f33d5d2816fbf7e8dbf275b1c89"
+      },
+      {
+        "name": "qttools",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_64/qt.qt6.6112.win64_msvc2022_64/6.11.2-0-202608131017qttools-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-X86_64.7z",
+        "sha256": "5f2b387a1f8055102b1388ff4ea743124ed6389d442f75c659728bb5c2a56946"
+      },
+      {
+        "name": "qttranslations",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_64/qt.qt6.6112.win64_msvc2022_64/6.11.2-0-202608131017qttranslations-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-X86_64.7z",
+        "sha256": "1c9516ce25d286ecf97e7aaaa5c8fa395823f21af5fa3dcb7bd06f648453dd77"
+      }
+    ]
+  },
+  "windows-arm64": {
+    "subdir": "msvc2022_arm64",
+    "archives": [
+      {
+        "name": "qtimageformats",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_arm64_cross_compiled/qt.qt6.6112.addons.qtimageformats.win64_msvc2022_arm64_cross_compiled/6.11.2-0-202608131017qtimageformats-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-ARM64.7z",
+        "sha256": "d96763dc722d96b63103f64e535a00ec4c0b684a3a93423563d2b0d29ee7f586"
+      },
+      {
+        "name": "qtbase",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_arm64_cross_compiled/qt.qt6.6112.win64_msvc2022_arm64_cross_compiled/6.11.2-0-202608131017qtbase-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-ARM64.7z",
+        "sha256": "14f769e2a4e9a9486f3d9f4849a6e593e165537f8665a42936c4bb5760eac43a"
+      },
+      {
+        "name": "qtsvg",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_arm64_cross_compiled/qt.qt6.6112.win64_msvc2022_arm64_cross_compiled/6.11.2-0-202608131017qtsvg-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-ARM64.7z",
+        "sha256": "93775de762d295042d1d97adeaf2415823edb92ce13e6115365b13ef8940a82b"
+      },
+      {
+        "name": "qttools",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_arm64_cross_compiled/qt.qt6.6112.win64_msvc2022_arm64_cross_compiled/6.11.2-0-202608131017qttools-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-ARM64.7z",
+        "sha256": "61d93c980a6426839b16ca29a99c88aebe0988c4f9755779dc5fcfb1b0bb77e3"
+      },
+      {
+        "name": "qttranslations",
+        "url": "https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_6112/qt6_6112_msvc2022_arm64_cross_compiled/qt.qt6.6112.win64_msvc2022_arm64_cross_compiled/6.11.2-0-202608131017qttranslations-Windows-Windows_11_24H2-MSVC2022-Windows-Windows_11_24H2-ARM64.7z",
+        "sha256": "308cc4221ef7139df15f244783eb823972814e9b75a2dd912080b44e1673edbc"
+      }
+    ]
+  },
+  "macos": {
+    "subdir": "macos",
+    "archives": [
+      {
+        "name": "qtimageformats",
+        "url": "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.addons.qtimageformats.clang_64/6.11.2-0-202608131016qtimageformats-MacOS-MacOS_15-Clang-MacOS-MacOS_15-X86_64-ARM64.7z",
+        "sha256": "97bf59aa42a2d0016dc38cfe24a8cf2a7473ee7eac52403a56fbaa92f5842450"
+      },
+      {
+        "name": "qtbase",
+        "url": "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.clang_64/6.11.2-0-202608131016qtbase-MacOS-MacOS_15-Clang-MacOS-MacOS_15-X86_64-ARM64.7z",
+        "sha256": "9592f84f7e26d532c5c56824d1da7c9214a766cb0a17beb5af71022bcfbcd271"
+      },
+      {
+        "name": "qtsvg",
+        "url": "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.clang_64/6.11.2-0-202608131016qtsvg-MacOS-MacOS_15-Clang-MacOS-MacOS_15-X86_64-ARM64.7z",
+        "sha256": "c52f6cec6ce4b52ca017e0046345a85d33b2b73e0f6a93474bb7a60f8e829317"
+      },
+      {
+        "name": "qttools",
+        "url": "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.clang_64/6.11.2-0-202608131016qttools-MacOS-MacOS_15-Clang-MacOS-MacOS_15-X86_64-ARM64.7z",
+        "sha256": "415b5008059d0066ac0d4806de98f6e8dacf7b5c80ca0305875160d2107d3719"
+      }
+    ]
+  },
+  "linux-x64": {
+    "subdir": "gcc_64",
+    "archives": [
+      {
+        "name": "qtimageformats",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.addons.qtimageformats.linux_gcc_64/6.11.2-0-202608131018qtimageformats-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z",
+        "sha256": "695902faa2ec140678ce2310228d913dcf0907270f24cb34844dfa72daa1238f"
+      },
+      {
+        "name": "qtbase",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.linux_gcc_64/6.11.2-0-202608131018qtbase-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z",
+        "sha256": "0f86f13b161141e77b1d056b54e2b6fc40fb16f243e71123346f9fb35d418027"
+      },
+      {
+        "name": "qtsvg",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.linux_gcc_64/6.11.2-0-202608131018qtsvg-Linux-RHEL_9_6-GCC-Linux-RHEL_9_6-X86_64.7z",
+        "sha256": "939fe0e5d49d11d6d3eceea0184219703c25a1f8dc75f45e99071ca244824a0d"
+      },
+      {
+        "name": "icu",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.linux_gcc_64/6.11.2-0-202608131018icu-linux-Rhel8.6-x86_64.7z",
+        "sha256": "111bdae30a66fff6ef65620e95766170fa5a6f425c360ea33b79cb2ec7e2fd86"
+      }
+    ]
+  },
+  "linux-arm64": {
+    "subdir": "gcc_arm64",
+    "archives": [
+      {
+        "name": "qtimageformats",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_arm64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.addons.qtimageformats.linux_gcc_arm64/6.11.2-0-202608131018qtimageformats-Linux-Ubuntu_24_04-GCC-Linux-Ubuntu_24_04-AARCH64.7z",
+        "sha256": "43f86af6a7be8d96e1ee4529fd4bab331d7406ee37845754c108896d0e38fc05"
+      },
+      {
+        "name": "qtbase",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_arm64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.linux_gcc_arm64/6.11.2-0-202608131018qtbase-Linux-Ubuntu_24_04-GCC-Linux-Ubuntu_24_04-AARCH64.7z",
+        "sha256": "2f9991bc4e5660fd36d70df04239fadc17acf135f201041cdc1bf6c82ae43aa4"
+      },
+      {
+        "name": "qtsvg",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_arm64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.linux_gcc_arm64/6.11.2-0-202608131018qtsvg-Linux-Ubuntu_24_04-GCC-Linux-Ubuntu_24_04-AARCH64.7z",
+        "sha256": "e888bfbe3e1cf057af6c420fe797d16565bfd1755f1ef93febd641798c4d8c12"
+      },
+      {
+        "name": "icu",
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_arm64/desktop/qt6_6112/qt6_6112/qt.qt6.6112.linux_gcc_arm64/6.11.2-0-202608131018icu-linux-Debian11.6-arm64.7z",
+        "sha256": "5462a23551504f42ac5528ab7bc5ef6988f8257a4e63a56144a44af441f0c4f4"
+      }
+    ]
+  }
+}

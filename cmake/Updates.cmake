@@ -1,0 +1,20 @@
+set(PICLOCATE_UPDATE_REPOSITORY "" CACHE STRING "Public GitHub owner/repository for releases (empty disables updates)")
+if(PICLOCATE_UPDATE_REPOSITORY AND NOT PICLOCATE_UPDATE_REPOSITORY MATCHES "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+  message(FATAL_ERROR "PICLOCATE_UPDATE_REPOSITORY must be a GitHub owner/repository.")
+endif()
+add_library(piclocate_updates STATIC src/updates/update.cpp src/updates/update.h)
+target_include_directories(piclocate_updates PUBLIC src)
+target_link_libraries(piclocate_updates PUBLIC Qt6::Core Qt6::Network)
+target_compile_definitions(piclocate_updates PUBLIC QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII)
+target_compile_definitions(piclocate_updates PRIVATE
+  PICLOCATE_VERSION="${PROJECT_VERSION}"
+  PICLOCATE_UPDATE_REPOSITORY="${PICLOCATE_UPDATE_REPOSITORY}"
+  PICLOCATE_PLATFORM_KEY="${PICLOCATE_PLATFORM_KEY}")
+if(MSVC)
+  target_compile_options(piclocate_updates PRIVATE /W4 /permissive- /utf-8)
+endif()
+if(NOT WIN32)
+  install(PROGRAMS installer/update-unix.sh DESTINATION ${PICLOCATE_RESOURCE_DEST})
+endif()
+file(WRITE "${CMAKE_BINARY_DIR}/piclocate-package" "${PICLOCATE_PLATFORM_KEY}\n")
+install(FILES "${CMAKE_BINARY_DIR}/piclocate-package" DESTINATION ${PICLOCATE_RESOURCE_DEST} RENAME .piclocate-package)

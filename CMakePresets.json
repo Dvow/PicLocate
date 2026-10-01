@@ -1,0 +1,15 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {"major": 3, "minor": 24, "patch": 0},
+  "configurePresets": [
+    {
+      "name": "release",
+      "displayName": "Windows x64 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/.build/cpm-release",
+      "cacheVariables": {"CMAKE_BUILD_TYPE": "Release", "BUILD_TESTING": "ON", "PICLOCATE_BUNDLE_MODELS": "ON"}
+    }
+  ],
+  "buildPresets": [{"name": "release", "configurePreset": "release", "jobs": 4}],
+  "testPresets": [{"name": "release", "configurePreset": "release", "output": {"outputOnFailure": true}}]
+}

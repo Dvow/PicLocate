@@ -1,0 +1,81 @@
+[Setup]
+AppId=PicLocate.LocalImageSearch
+AppName=PicLocate
+AppVersion=@PROJECT_VERSION@
+AppPublisher=PicLocate contributors
+AppComments=Private, local image search
+VersionInfoDescription=PicLocate Setup
+VersionInfoVersion=@PROJECT_VERSION@.0
+DefaultDirName={localappdata}\Programs\PicLocate
+DefaultGroupName=PicLocate
+DisableDirPage=yes
+DisableProgramGroupPage=auto
+PrivilegesRequired=lowest
+ArchitecturesAllowed=@PICLOCATE_INSTALL_ARCH@
+ArchitecturesInstallIn64BitMode=@PICLOCATE_INSTALL_ARCH@
+MinVersion=@PICLOCATE_WINDOWS_MINIMUM@
+WizardStyle=modern dynamic
+SetupIconFile=@PICLOCATE_ICON@
+UninstallDisplayIcon={app}\PicLocate.exe
+UninstallDisplayName=PicLocate
+CloseApplications=yes
+RestartApplications=no
+CloseApplicationsFilter=PicLocate.exe
+LicenseFile=@PROJECT_SOURCE_DIR@/LICENSE
+OutputDir=@PICLOCATE_INSTALLER_OUTPUT_DIR@
+OutputBaseFilename=@PICLOCATE_SETUP_BASENAME@
+Compression=lzma2/max
+SolidCompression=yes
+UsePreviousTasks=yes
+
+[Tasks]
+Name: desktopicon; Description: "Create a &desktop shortcut"; Check: not WizardSilent
+
+[Files]
+Source: "@PICLOCATE_INSTALLER_STAGE@/*"; DestDir: "{app}"; Excludes: ".piclocate-installer-stage"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Icons]
+Name: "{group}\PicLocate"; Filename: "{app}\PicLocate.exe"; WorkingDir: "{app}"
+Name: "{userdesktop}\PicLocate"; Filename: "{app}\PicLocate.exe"; WorkingDir: "{app}"; Tasks: desktopicon; Check: not WizardSilent
+
+[Run]
+Filename: "{app}\PicLocate.exe"; Description: "Open PicLocate"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\PicLocate.exe"; Parameters: "--data-dir ""{param:UPDATEDATA}"""; Flags: nowait; Check: IsUpdate
+
+; No AppData or library deletion: uninstall only removes files installed above.
+
+[Code]
+function OpenProcess(Access: LongWord; Inherit: Boolean; ProcessId: LongWord): THandle;
+  external 'OpenProcess@kernel32.dll stdcall';
+function WaitForSingleObject(Handle: THandle; Milliseconds: LongWord): LongWord;
+  external 'WaitForSingleObject@kernel32.dll stdcall';
+function CloseHandle(Handle: THandle): Boolean;
+  external 'CloseHandle@kernel32.dll stdcall';
+function ProcessError: LongWord;
+  external 'GetLastError@kernel32.dll stdcall';
+
+function IsUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:UPDATEPID|0}') <> '0';
+end;
+
+function InitializeSetup: Boolean;
+var
+  Handle: THandle;
+  ProcessId: LongWord;
+begin
+  Result := True;
+  ProcessId := StrToIntDef(ExpandConstant('{param:UPDATEPID|0}'), 0);
+  if ProcessId = 0 then Exit;
+  Handle := OpenProcess($100000, False, ProcessId);
+  if Handle = 0 then begin
+    { Error 87 means the parent already exited. Other errors must not bypass waiting. }
+    Result := ProcessError = 87;
+    Exit;
+  end;
+  { The app finishes its current scan batch and closes its database before replacement. }
+  Result := WaitForSingleObject(Handle, 300000) = 0;
+  CloseHandle(Handle);
+  if not Result then
+    MsgBox('Close PicLocate, then run the update again.', mbError, MB_OK);
+end;
